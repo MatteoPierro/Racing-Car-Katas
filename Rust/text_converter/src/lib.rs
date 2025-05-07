@@ -49,13 +49,15 @@ mod tests {
 
     #[test]
     fn test_html_text_converter() {
-        fs::write("foo.txt", "").unwrap();
+        let file_path = "foo.txt";
+        
+        fs::write(file_path, "").unwrap();
 
-        let converter = HtmlTextConverter::new("foo.txt");
+        let converter = HtmlTextConverter::new(file_path);
         let converted = converter.convert_to_html();
         assert!(converted.is_ok());
 
-        fs::remove_file("foo.txt").unwrap()
+        fs::remove_file(file_path).unwrap()
     }
 
     #[test]
