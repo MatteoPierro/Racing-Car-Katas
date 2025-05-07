@@ -45,19 +45,18 @@ fn escape_html(input: &str) -> String {
 #[cfg(test)]
 mod tests {
     use std::fs;
+    use uuid::Uuid;
     use super::*;
 
     #[test]
     fn test_html_text_converter() {
-        let file_path = "foo.txt";
-        
+        let file_path = &format!("/tmp/{}.txt", Uuid::new_v4());
+
         fs::write(file_path, "").unwrap();
 
         let converter = HtmlTextConverter::new(file_path);
         let converted = converter.convert_to_html();
         assert!(converted.is_ok());
-
-        fs::remove_file(file_path).unwrap()
     }
 
     #[test]
