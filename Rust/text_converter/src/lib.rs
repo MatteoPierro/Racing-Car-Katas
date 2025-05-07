@@ -44,12 +44,18 @@ fn escape_html(input: &str) -> String {
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
     use super::*;
 
     #[test]
     fn test_html_text_converter() {
+        fs::write("foo.txt", "").unwrap();
+
         let converter = HtmlTextConverter::new("foo.txt");
-        assert_eq!("foo.txt", converter.get_filename());
+        let converted = converter.convert_to_html();
+        assert!(converted.is_ok());
+
+        fs::remove_file("foo.txt").unwrap()
     }
 
     #[test]
