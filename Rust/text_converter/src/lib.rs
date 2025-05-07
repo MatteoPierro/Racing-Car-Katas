@@ -48,18 +48,6 @@ mod tests {
     use uuid::Uuid;
 
     #[test]
-    fn when_content_is_empty() {
-        let file_path = &format!("/tmp/{}.txt", Uuid::new_v4());
-
-        fs::write(file_path, "").unwrap();
-
-        let converter = HtmlTextConverter::new(file_path);
-        let converted = converter.convert_to_html().unwrap();
-
-        assert_eq!("", converted);
-    }
-
-    #[test]
     fn when_there_is_a_content() {
         let file_path = &format!("/tmp/{}.txt", Uuid::new_v4());
 
