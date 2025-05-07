@@ -60,6 +60,18 @@ mod tests {
     }
 
     #[test]
+    fn when_there_is_a_content() {
+        let file_path = &format!("/tmp/{}.txt", Uuid::new_v4());
+
+        fs::write(file_path, "first line\ninter>barcelona").unwrap();
+
+        let converter = HtmlTextConverter::new(file_path);
+        let converted = converter.convert_to_html().unwrap();
+
+        assert_eq!("first line<br />inter&gt;barcelona<br />", converted);
+    }
+
+    #[test]
     #[ignore]
     fn test_html_pages_converter() {
         let converter = HtmlPagesConverter::new("foo.txt").unwrap();
