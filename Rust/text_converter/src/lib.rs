@@ -1,6 +1,6 @@
 // src/lib.rs
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
+use std::io::{self, BufRead, BufReader, Lines, Seek, SeekFrom};
 
 pub struct HtmlTextConverter {
     full_filename_with_path: String,
@@ -14,17 +14,23 @@ impl HtmlTextConverter {
     }
 
     pub fn convert_to_html(&self) -> io::Result<String> {
-        let file = File::open(&self.full_filename_with_path)?;
-        let reader = BufReader::new(file);
-        let mut html = String::new();
+        let lines = self.lines()?;
 
-        for line in reader.lines() {
+        let mut html = String::new();
+        for line in lines {
             let line = line?;
             html.push_str(&escape_html(&line));
             html.push_str("<br />");
         }
 
         Ok(html)
+    }
+
+    fn lines(&self) -> io::Result<Lines<BufReader<File>>> {
+        let file = File::open(&self.full_filename_with_path)?;
+        let reader = BufReader::new(file);
+        let lines = reader.lines();
+        Ok(lines)
     }
 
     pub fn get_filename(&self) -> &str {
