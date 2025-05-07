@@ -1,7 +1,6 @@
 // src/lib.rs
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
-use std::path::Path;
 
 pub struct HtmlTextConverter {
     full_filename_with_path: String,
@@ -44,19 +43,20 @@ fn escape_html(input: &str) -> String {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use std::fs;
     use uuid::Uuid;
-    use super::*;
 
     #[test]
-    fn test_html_text_converter() {
+    fn when_content_is_empty() {
         let file_path = &format!("/tmp/{}.txt", Uuid::new_v4());
 
         fs::write(file_path, "").unwrap();
 
         let converter = HtmlTextConverter::new(file_path);
-        let converted = converter.convert_to_html();
-        assert!(converted.is_ok());
+        let converted = converter.convert_to_html().unwrap();
+
+        assert_eq!("", converted);
     }
 
     #[test]
@@ -66,7 +66,6 @@ mod tests {
         assert_eq!("foo.txt", converter.get_filename());
     }
 }
-
 
 pub struct HtmlPagesConverter {
     filename: String,
