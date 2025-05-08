@@ -14,20 +14,14 @@ impl HtmlTextConverter {
     }
 
     pub fn convert_to_html(&self) -> io::Result<String> {
-        let lines = self.lines()?;
-
         let mut html = String::new();
-        for line in lines {
+        for line in self.reader.lines()? {
             let line = line?;
             html.push_str(&escape_html(&line));
             html.push_str("<br />");
         }
 
         Ok(html)
-    }
-
-    fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item=io::Result<String>> + 'a> {
-        self.reader.lines()
     }
 }
 
