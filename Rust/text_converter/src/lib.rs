@@ -32,10 +32,6 @@ impl HtmlTextConverter {
     fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item=io::Result<String>> + 'a> {
         self.reader.lines()
     }
-
-    pub fn get_filename(&self) -> &str {
-        &self.full_filename_with_path
-    }
 }
 
 struct FileLinesReader {
