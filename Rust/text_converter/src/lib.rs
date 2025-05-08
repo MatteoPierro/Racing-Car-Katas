@@ -1,11 +1,11 @@
 // src/lib.rs
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
-pub struct HtmlTextConverter {
-    reader: FileLinesReader
+pub struct HtmlTextConverter<Reader: LinesReader> {
+    reader: Reader
 }
 
-impl HtmlTextConverter {
+impl HtmlTextConverter<FileLinesReader> {
     pub fn new(full_filename_with_path: &str) -> Self {
         Self {
             reader: FileLinesReader { path: full_filename_with_path.to_string() }
