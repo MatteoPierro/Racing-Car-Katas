@@ -1,7 +1,6 @@
 // src/lib.rs
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
-
 pub struct HtmlTextConverter {
     reader: FileLinesReader
 }
@@ -15,6 +14,7 @@ impl HtmlTextConverter {
 
     pub fn convert_to_html(&self) -> io::Result<String> {
         let mut html = String::new();
+
         for line in self.reader.lines()? {
             let line = line?;
             html.push_str(&escape_html(&line));
@@ -29,13 +29,17 @@ struct FileLinesReader {
     path: String,
 }
 
-impl FileLinesReader {
-    pub fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item=io::Result<String>> + 'a> {
+impl LinesReader for FileLinesReader {
+    fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item=io::Result<String>> + 'a> {
         let file = File::open(&self.path)?;
         let reader = BufReader::new(file);
         let lines = reader.lines();
         Ok(lines)
     }
+}
+
+pub trait LinesReader {
+    fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item=io::Result<String>> + 'a>;
 }
 
 fn escape_html(input: &str) -> String {
