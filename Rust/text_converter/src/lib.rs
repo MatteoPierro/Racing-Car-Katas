@@ -4,12 +4,15 @@ use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
 
 pub struct HtmlTextConverter {
     full_filename_with_path: String,
+    reader: FileLinesReader
 }
 
 impl HtmlTextConverter {
     pub fn new(full_filename_with_path: &str) -> Self {
+        let reader = FileLinesReader { path: full_filename_with_path.to_string() };
         Self {
             full_filename_with_path: full_filename_with_path.to_string(),
+            reader
         }
     }
 
@@ -27,14 +30,24 @@ impl HtmlTextConverter {
     }
 
     fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item=io::Result<String>> + 'a> {
-        let file = File::open(&self.full_filename_with_path)?;
-        let reader = BufReader::new(file);
-        let lines = reader.lines();
-        Ok(lines)
+        self.reader.lines()
     }
 
     pub fn get_filename(&self) -> &str {
         &self.full_filename_with_path
+    }
+}
+
+struct FileLinesReader {
+    path: String,
+}
+
+impl FileLinesReader {
+    pub fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item=io::Result<String>> + 'a> {
+        let file = File::open(&self.path)?;
+        let reader = BufReader::new(file);
+        let lines = reader.lines();
+        Ok(lines)
     }
 }
 
