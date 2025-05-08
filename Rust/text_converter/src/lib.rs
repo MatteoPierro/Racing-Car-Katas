@@ -3,16 +3,13 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
 
 pub struct HtmlTextConverter {
-    full_filename_with_path: String,
     reader: FileLinesReader
 }
 
 impl HtmlTextConverter {
     pub fn new(full_filename_with_path: &str) -> Self {
-        let reader = FileLinesReader { path: full_filename_with_path.to_string() };
         Self {
-            full_filename_with_path: full_filename_with_path.to_string(),
-            reader
+            reader: FileLinesReader { path: full_filename_with_path.to_string() }
         }
     }
 
