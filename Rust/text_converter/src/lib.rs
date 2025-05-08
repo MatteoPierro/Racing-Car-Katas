@@ -1,6 +1,6 @@
 // src/lib.rs
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, Lines, Seek, SeekFrom};
+use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
 
 pub struct HtmlTextConverter {
     full_filename_with_path: String,
@@ -26,7 +26,7 @@ impl HtmlTextConverter {
         Ok(html)
     }
 
-    fn lines(&self) -> io::Result<Lines<BufReader<File>>> {
+    fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item=io::Result<String>> + 'a> {
         let file = File::open(&self.full_filename_with_path)?;
         let reader = BufReader::new(file);
         let lines = reader.lines();
