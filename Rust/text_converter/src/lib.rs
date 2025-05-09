@@ -58,7 +58,7 @@ mod tests {
     use uuid::Uuid;
 
     #[test]
-    fn when_there_is_a_content() {
+    fn when_using_a_real_file_lines_reader() {
         let file_path = &format!("/tmp/{}.txt", Uuid::new_v4());
 
         fs::write(file_path, "first line\ninter>barcelona").unwrap();
@@ -69,6 +69,23 @@ mod tests {
         let converted = converter.convert_to_html().unwrap();
 
         assert_eq!("first line<br />inter&gt;barcelona<br />", converted);
+    }
+
+    #[test]
+    fn convert_a_single_line() {
+        let reader = FakeLinesReader(vec!["single line".to_string()]);
+
+        let converter = HtmlTextConverter::new(reader);
+        let converted = converter.convert_to_html().unwrap();
+
+        assert_eq!("single line<br />", converted);
+    }
+
+    struct FakeLinesReader(Vec<String>);
+    impl LinesReader for FakeLinesReader {
+        fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item = io::Result<String>> + 'a> {
+            Ok(self.0.iter().map(|s| Ok(s.clone())))
+        }
     }
 
     #[test]
