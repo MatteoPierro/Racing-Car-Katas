@@ -2,13 +2,13 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
 pub struct HtmlTextConverter<Reader: LinesReader> {
-    reader: Reader
+    reader: Reader,
 }
 
-impl HtmlTextConverter<FileLinesReader> {
-    pub fn new(full_filename_with_path: &str) -> Self {
+impl<Reader: LinesReader> HtmlTextConverter<Reader> {
+    pub fn new(lines_reader: Reader) -> Self {
         Self {
-            reader: FileLinesReader { path: full_filename_with_path.to_string() }
+            reader: lines_reader,
         }
     }
 
@@ -30,7 +30,7 @@ struct FileLinesReader {
 }
 
 impl LinesReader for FileLinesReader {
-    fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item=io::Result<String>> + 'a> {
+    fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item = io::Result<String>> + 'a> {
         let file = File::open(&self.path)?;
         let reader = BufReader::new(file);
         let lines = reader.lines();
@@ -39,7 +39,7 @@ impl LinesReader for FileLinesReader {
 }
 
 pub trait LinesReader {
-    fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item=io::Result<String>> + 'a>;
+    fn lines<'a>(&'a self) -> io::Result<impl Iterator<Item = io::Result<String>> + 'a>;
 }
 
 fn escape_html(input: &str) -> String {
@@ -63,7 +63,9 @@ mod tests {
 
         fs::write(file_path, "first line\ninter>barcelona").unwrap();
 
-        let converter = HtmlTextConverter::new(file_path);
+        let converter = HtmlTextConverter::new(FileLinesReader {
+            path: file_path.to_string(),
+        });
         let converted = converter.convert_to_html().unwrap();
 
         assert_eq!("first line<br />inter&gt;barcelona<br />", converted);
