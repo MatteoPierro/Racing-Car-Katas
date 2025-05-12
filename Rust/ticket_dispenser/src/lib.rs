@@ -29,12 +29,18 @@ impl ConsecutiveTurnNumberSequence {
     pub fn new() -> Self {
         Self { turn_number: 0 }
     }
+}
 
-    pub fn get_next_turn_number(&mut self) -> usize {
+impl TurnNumberSequence for ConsecutiveTurnNumberSequence {
+    fn get_next_turn_number(&mut self) -> usize {
         let next_turn_number = self.turn_number;
         self.turn_number += 1;
         next_turn_number
     }
+}
+
+pub trait TurnNumberSequence {
+    fn get_next_turn_number(&mut self) -> usize;
 }
 
 pub struct TurnTicket {
