@@ -3,12 +3,12 @@
 // TODO
 // 1. how can we avoid to make the TicketDispenser#get_turn_ticker mutable?
 //    we only need it due to the current implementation of TurnNumberSequence!
-pub struct TicketDispenser {
-    turn_number_sequence: ConsecutiveTurnNumberSequence,
+pub struct TicketDispenser<NumberSequence: TurnNumberSequence> {
+    turn_number_sequence: NumberSequence,
 }
 
-impl TicketDispenser {
-    pub(crate) fn new(turn_number_sequence: ConsecutiveTurnNumberSequence) -> Self {
+impl<NumberSequence: TurnNumberSequence> TicketDispenser<NumberSequence> {
+    pub(crate) fn new(turn_number_sequence: NumberSequence) -> Self {
         Self { turn_number_sequence }
     }
     
