@@ -11,12 +11,9 @@ impl TicketDispenser {
     pub(crate) fn new(turn_number_sequence: ConsecutiveTurnNumberSequence) -> Self {
         Self { turn_number_sequence }
     }
-}
-
-impl TicketDispenser {
+    
     pub fn get_turn_ticket(&mut self) -> TurnTicket {
-        let mut turn_number_sequence = &mut self.turn_number_sequence;
-        let new_turn_number = turn_number_sequence.get_next_turn_number();
+        let new_turn_number = self.turn_number_sequence.get_next_turn_number();
         TurnTicket::new(new_turn_number)
     }
 }
@@ -60,7 +57,7 @@ impl TurnTicket {
 // src/test.rs
 #[cfg(test)]
 mod tests {
-    use super::{TicketDispenser, ConsecutiveTurnNumberSequence, TurnTicket};
+    use super::{ConsecutiveTurnNumberSequence, TicketDispenser};
 
     #[test]
     fn foo() {
