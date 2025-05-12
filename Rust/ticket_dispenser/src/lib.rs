@@ -3,6 +3,8 @@
 // TODO
 // 1. how can we avoid to make the TicketDispenser#get_turn_ticker mutable?
 //    we only need it due to the current implementation of TurnNumberSequence!
+// 2. write test with more than 1 number issues by 1 dispenser. 
+// 3. write a test with multiple dispensers
 pub struct TicketDispenser<NumberSequence: TurnNumberSequence> {
     turn_number_sequence: NumberSequence,
 }
@@ -57,12 +59,23 @@ impl TurnTicket {
 // src/test.rs
 #[cfg(test)]
 mod tests {
-    use super::{ConsecutiveTurnNumberSequence, TicketDispenser};
+    use super::{TicketDispenser, TurnNumberSequence};
 
     #[test]
     fn foo() {
-        let mut dispenser = TicketDispenser::new(ConsecutiveTurnNumberSequence::new());
+        let number_sequence = FakeTurnNumberSequence(vec![0]);
+        let mut dispenser = TicketDispenser::new(number_sequence);
+        
         let ticket = dispenser.get_turn_ticket();
+        
         assert_eq!(ticket.get_turn_number(), 0);
+    }
+
+    struct FakeTurnNumberSequence(Vec<usize>);
+    
+    impl TurnNumberSequence for FakeTurnNumberSequence {
+        fn get_next_turn_number(&mut self) -> usize {
+            self.0.pop().unwrap()
+        }
     }
 }
