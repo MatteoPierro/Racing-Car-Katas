@@ -1,9 +1,21 @@
 // src/lib.rs
-pub struct TicketDispenser;
+
+// TODO
+// 1. how can we avoid to make the TicketDispenser#get_turn_ticker mutable?
+//    we only need it due to the current implementation of TurnNumberSequence!
+pub struct TicketDispenser {
+    turn_number_sequence: TurnNumberSequence,
+}
 
 impl TicketDispenser {
-    pub fn get_turn_ticket(&self) -> TurnTicket {
-        let mut turn_number_sequence = TurnNumberSequence::new();
+    pub(crate) fn new(turn_number_sequence: TurnNumberSequence) -> Self {
+        Self { turn_number_sequence }
+    }
+}
+
+impl TicketDispenser {
+    pub fn get_turn_ticket(&mut self) -> TurnTicket {
+        let mut turn_number_sequence = &mut self.turn_number_sequence;
         let new_turn_number = turn_number_sequence.get_next_turn_number();
         TurnTicket::new(new_turn_number)
     }
@@ -42,11 +54,11 @@ impl TurnTicket {
 // src/test.rs
 #[cfg(test)]
 mod tests {
-    use super::{TicketDispenser, TurnTicket};
+    use super::{TicketDispenser, TurnNumberSequence, TurnTicket};
 
     #[test]
     fn foo() {
-        let dispenser = TicketDispenser;
+        let mut dispenser = TicketDispenser::new(TurnNumberSequence::new());
         let ticket = dispenser.get_turn_ticket();
         assert_eq!(ticket.get_turn_number(), 0);
     }
