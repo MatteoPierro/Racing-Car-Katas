@@ -74,6 +74,19 @@ mod tests {
         assert_eq!(dispenser.get_turn_ticket().get_turn_number(), 1);
     }
 
+    // #[test]
+    // fn the_same_ticket_should_not_be_issued_to_two_different_customers() {
+    //     let number_sequence = FakeTurnNumberSequence(vec![2, 5, 9, 1, 11]);
+    //     let mut first_dispenser = TicketDispenser::new(number_sequence);
+    //     let mut second_dispenser = TicketDispenser::new(number_sequence);
+    //
+    //     assert_eq!(first_dispenser.get_turn_ticket().get_turn_number(), 2);
+    //     assert_eq!(second_dispenser.get_turn_ticket().get_turn_number(), 5);
+    //     assert_eq!(first_dispenser.get_turn_ticket().get_turn_number(), 9);
+    //     assert_eq!(second_dispenser.get_turn_ticket().get_turn_number(), 1);
+    //     assert_eq!(second_dispenser.get_turn_ticket().get_turn_number(), 11);
+    // }
+
     struct FakeTurnNumberSequence(Vec<usize>);
 
     impl TurnNumberSequence for FakeTurnNumberSequence {
