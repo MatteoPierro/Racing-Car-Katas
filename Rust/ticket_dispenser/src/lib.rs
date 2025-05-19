@@ -3,17 +3,19 @@
 // TODO
 // 1. how can we avoid to make the TicketDispenser#get_turn_ticker mutable?
 //    we only need it due to the current implementation of TurnNumberSequence!
-// 2. write test with more than 1 number issues by 1 dispenser. 
-// 3. write a test with multiple dispensers
+//    => shall we use Arc<Mutex<>>?
+// 2. write a test with multiple dispensers
 pub struct TicketDispenser<NumberSequence: TurnNumberSequence> {
     turn_number_sequence: NumberSequence,
 }
 
 impl<NumberSequence: TurnNumberSequence> TicketDispenser<NumberSequence> {
     pub(crate) fn new(turn_number_sequence: NumberSequence) -> Self {
-        Self { turn_number_sequence }
+        Self {
+            turn_number_sequence,
+        }
     }
-    
+
     pub fn get_turn_ticket(&mut self) -> TurnTicket {
         let new_turn_number = self.turn_number_sequence.get_next_turn_number();
         TurnTicket::new(new_turn_number)
@@ -62,20 +64,21 @@ mod tests {
     use super::{TicketDispenser, TurnNumberSequence};
 
     #[test]
-    fn foo() {
-        let number_sequence = FakeTurnNumberSequence(vec![0]);
+    fn issues_a_sequence_of_tickets() {
+        let number_sequence = FakeTurnNumberSequence(vec![2, 5, 9, 1, 11]);
         let mut dispenser = TicketDispenser::new(number_sequence);
-        
-        let ticket = dispenser.get_turn_ticket();
-        
-        assert_eq!(ticket.get_turn_number(), 0);
+
+        assert_eq!(dispenser.get_turn_ticket().get_turn_number(), 2);
+        assert_eq!(dispenser.get_turn_ticket().get_turn_number(), 5);
+        assert_eq!(dispenser.get_turn_ticket().get_turn_number(), 9);
+        assert_eq!(dispenser.get_turn_ticket().get_turn_number(), 1);
     }
 
     struct FakeTurnNumberSequence(Vec<usize>);
-    
+
     impl TurnNumberSequence for FakeTurnNumberSequence {
         fn get_next_turn_number(&mut self) -> usize {
-            self.0.pop().unwrap()
+            self.0.remove(0)
         }
     }
 }
