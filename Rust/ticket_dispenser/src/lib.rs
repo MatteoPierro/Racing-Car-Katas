@@ -33,11 +33,11 @@ impl ConsecutiveTurnNumberSequence {
 
 impl TurnNumberSequence for ConsecutiveTurnNumberSequence {
     fn get_next_turn_number(&self) -> usize {
-        let result = self.turn_number.lock();
-        if result.is_err() {
+        let lock = self.turn_number.lock();
+        if lock.is_err() {
             panic!("Failed to lock the mutex");
         }
-        let mut turn_number = result.unwrap();
+        let mut turn_number = lock.unwrap();
 
         let next_turn_number = *turn_number;
         *turn_number += 1;
@@ -72,7 +72,7 @@ mod tests {
     #[test]
     fn test_consecutive_turn() {
         let sequence = ConsecutiveTurnNumberSequence::new();
-        
+
         assert_eq!(sequence.get_next_turn_number(), 0);
         assert_eq!(sequence.get_next_turn_number(), 1);
     }
