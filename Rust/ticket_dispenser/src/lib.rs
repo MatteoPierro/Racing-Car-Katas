@@ -34,10 +34,7 @@ impl ConsecutiveTurnNumberSequence {
 impl TurnNumberSequence for ConsecutiveTurnNumberSequence {
     fn get_next_turn_number(&self) -> usize {
         let lock = self.turn_number.lock();
-        if lock.is_err() {
-            panic!("Failed to lock the mutex");
-        }
-        let mut turn_number = lock.unwrap();
+        let mut turn_number = lock.expect("Failed to lock the mutex");
 
         let next_turn_number = *turn_number;
         *turn_number += 1;
