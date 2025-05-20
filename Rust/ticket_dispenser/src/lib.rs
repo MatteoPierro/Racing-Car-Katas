@@ -1,5 +1,6 @@
 // src/lib.rs
 
+use std::ops::DerefMut;
 use std::sync::{Arc, Mutex};
 
 // TODO
@@ -30,16 +31,17 @@ pub struct ConsecutiveTurnNumberSequence {
 
 impl ConsecutiveTurnNumberSequence {
     pub fn new() -> Self {
-        Self { turn_number: Arc::new(Mutex::new(0)) }
+        Self {
+            turn_number: Arc::new(Mutex::new(0)),
+        }
     }
 }
 
 impl TurnNumberSequence for ConsecutiveTurnNumberSequence {
     fn get_next_turn_number(&self) -> usize {
-        let result = self.turn_number.lock();
-        todo!();
-        let next_turn_number = self.turn_number;
-        self.turn_number += 1;
+        let mut result = self.turn_number.lock().unwrap();
+        let next_turn_number = result.clone();
+        *result.deref_mut() += 1;
         next_turn_number
     }
 }
@@ -66,10 +68,11 @@ impl TurnTicket {
 #[cfg(test)]
 mod tests {
     use super::{TicketDispenser, TurnNumberSequence};
+    use std::sync::{Arc, Mutex};
 
     #[test]
     fn issues_a_sequence_of_tickets() {
-        let number_sequence = FakeTurnNumberSequence(vec![2, 5, 9, 1, 11]);
+        let number_sequence = FakeTurnNumberSequence(Arc::new(Mutex::new(vec![2, 5, 9, 1, 11])));
         let mut dispenser = TicketDispenser::new(&number_sequence);
 
         assert_eq!(dispenser.get_turn_ticket().get_turn_number(), 2);
@@ -80,7 +83,7 @@ mod tests {
 
     #[test]
     fn the_same_ticket_should_not_be_issued_to_two_different_customers() {
-        let number_sequence = FakeTurnNumberSequence(vec![2, 5, 9, 1, 11]);
+        let number_sequence = FakeTurnNumberSequence(Arc::new(Mutex::new(vec![2, 5, 9, 1, 11])));
         let mut first_dispenser = TicketDispenser::new(&number_sequence);
         let mut second_dispenser = TicketDispenser::new(&number_sequence);
 
@@ -91,11 +94,11 @@ mod tests {
         assert_eq!(second_dispenser.get_turn_ticket().get_turn_number(), 11);
     }
 
-    struct FakeTurnNumberSequence(Vec<usize>);
+    struct FakeTurnNumberSequence(Arc<Mutex<Vec<usize>>>);
 
     impl TurnNumberSequence for FakeTurnNumberSequence {
         fn get_next_turn_number(&self) -> usize {
-            self.0.remove(0)
+            self.0.lock().unwrap().remove(0)
         }
     }
 }
