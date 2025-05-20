@@ -1,6 +1,5 @@
 // src/lib.rs
 
-use std::ops::DerefMut;
 use std::sync::{Arc, Mutex};
 
 pub struct TicketDispenser<'a, NumberSequence: TurnNumberSequence> {
@@ -34,9 +33,14 @@ impl ConsecutiveTurnNumberSequence {
 
 impl TurnNumberSequence for ConsecutiveTurnNumberSequence {
     fn get_next_turn_number(&self) -> usize {
-        let mut result = self.turn_number.lock().unwrap();
-        let next_turn_number = result.clone();
-        *result.deref_mut() += 1;
+        let result = self.turn_number.lock();
+        if result.is_err() {
+            panic!("Failed to lock the mutex");
+        }
+        let mut turn_number = result.unwrap();
+
+        let next_turn_number = *turn_number;
+        *turn_number += 1;
         next_turn_number
     }
 }
@@ -62,8 +66,16 @@ impl TurnTicket {
 // src/test.rs
 #[cfg(test)]
 mod tests {
-    use super::{TicketDispenser, TurnNumberSequence};
+    use super::{ConsecutiveTurnNumberSequence, TicketDispenser, TurnNumberSequence};
     use std::sync::{Arc, Mutex};
+
+    #[test]
+    fn test_consecutive_turn() {
+        let sequence = ConsecutiveTurnNumberSequence::new();
+        
+        assert_eq!(sequence.get_next_turn_number(), 0);
+        assert_eq!(sequence.get_next_turn_number(), 1);
+    }
 
     #[test]
     fn issues_a_sequence_of_tickets() {
