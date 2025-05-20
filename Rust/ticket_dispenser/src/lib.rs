@@ -3,11 +3,6 @@
 use std::ops::DerefMut;
 use std::sync::{Arc, Mutex};
 
-// TODO
-// 1. how can we avoid to make the TicketDispenser#get_turn_ticker mutable?
-//    we only need it due to the current implementation of TurnNumberSequence!
-//    => shall we use Arc<Mutex<>>?
-// 2. write a test with multiple dispensers
 pub struct TicketDispenser<'a, NumberSequence: TurnNumberSequence> {
     turn_number_sequence: &'a NumberSequence,
 }
