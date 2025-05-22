@@ -18,12 +18,14 @@ impl RandomTelemetryClient {
             connection_events_simulator: StdRng::seed_from_u64(42),
         }
     }
+}
 
-    pub fn get_online_status(&self) -> bool {
+impl TelemetryClient for RandomTelemetryClient {
+    fn get_online_status(&self) -> bool {
         self.online_status
     }
-
-    pub fn connect(&mut self, telemetry_server_connection_string: &str) {
+    
+    fn connect(&mut self, telemetry_server_connection_string: &str) {
         if telemetry_server_connection_string.is_empty() {
             panic!("Invalid telemetry server connection string");
         }
@@ -31,12 +33,12 @@ impl RandomTelemetryClient {
         let success = self.connection_events_simulator.gen_range(0..10) <= 8;
         self.online_status = success;
     }
-
-    pub fn disconnect(&mut self) {
+    
+    fn disconnect(&mut self) {
         self.online_status = false;
     }
-
-    pub fn send(&mut self, message: &str) {
+    
+    fn send(&mut self, message: &str) {
         if message.is_empty() {
             panic!("Invalid message");
         }
@@ -59,8 +61,8 @@ impl RandomTelemetryClient {
                 .to_string();
         }
     }
-
-    pub fn receive(&mut self) -> String {
+    
+    fn receive(&mut self) -> String {
         if self.diagnostic_message_result.is_empty() {
             let message_length = self.connection_events_simulator.gen_range(60..110);
             let message = (0..message_length)
@@ -76,6 +78,14 @@ impl RandomTelemetryClient {
             message
         }
     }
+}
+
+pub trait TelemetryClient {
+    fn get_online_status(&self) -> bool;
+    fn connect(&mut self, telemetry_server_connection_string: &str);
+    fn disconnect(&mut self);
+    fn send(&mut self, message: &str);
+    fn receive(&mut self) -> String;
 }
 
 pub struct TelemetryDiagnosticControls {
