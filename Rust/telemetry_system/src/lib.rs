@@ -24,7 +24,7 @@ impl TelemetryClient for RandomTelemetryClient {
     fn get_online_status(&self) -> bool {
         self.online_status
     }
-    
+
     fn connect(&mut self, telemetry_server_connection_string: &str) {
         if telemetry_server_connection_string.is_empty() {
             panic!("Invalid telemetry server connection string");
@@ -33,11 +33,11 @@ impl TelemetryClient for RandomTelemetryClient {
         let success = self.connection_events_simulator.gen_range(0..10) <= 8;
         self.online_status = success;
     }
-    
+
     fn disconnect(&mut self) {
         self.online_status = false;
     }
-    
+
     fn send(&mut self, message: &str) {
         if message.is_empty() {
             panic!("Invalid message");
@@ -61,7 +61,7 @@ impl TelemetryClient for RandomTelemetryClient {
                 .to_string();
         }
     }
-    
+
     fn receive(&mut self) -> String {
         if self.diagnostic_message_result.is_empty() {
             let message_length = self.connection_events_simulator.gen_range(60..110);
@@ -96,9 +96,9 @@ pub struct TelemetryDiagnosticControls {
 impl TelemetryDiagnosticControls {
     pub const DIAGNOSTIC_CHANNEL_CONNECTION_STRING: &'static str = "*111#";
 
-    pub fn new() -> Self {
+    pub fn new(client: RandomTelemetryClient) -> Self {
         Self {
-            telemetry_client: RandomTelemetryClient::new(),
+            telemetry_client: client,
             diagnostic_info: String::new(),
         }
     }
@@ -141,8 +141,11 @@ mod tests {
     #[tokio::test]
     async fn check_transmission_should_send_a_diagnostic_message_and_receive_a_status_message_response(
     ) {
-        let mut telemetry_diagnostic_controls = TelemetryDiagnosticControls::new();
+        let mut telemetry_diagnostic_controls =
+            TelemetryDiagnosticControls::new(RandomTelemetryClient::new());
+
         telemetry_diagnostic_controls.check_transmission().unwrap();
+
         assert!(!telemetry_diagnostic_controls
             .get_diagnostic_info()
             .is_empty());
