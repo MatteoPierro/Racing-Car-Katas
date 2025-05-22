@@ -88,15 +88,15 @@ pub trait TelemetryClient {
     fn receive(&mut self) -> String;
 }
 
-pub struct TelemetryDiagnosticControls {
-    telemetry_client: RandomTelemetryClient,
+pub struct TelemetryDiagnosticControls<Client: TelemetryClient> {
+    telemetry_client: Client,
     diagnostic_info: String,
 }
 
-impl TelemetryDiagnosticControls {
+impl<Client: TelemetryClient> TelemetryDiagnosticControls<Client> {
     pub const DIAGNOSTIC_CHANNEL_CONNECTION_STRING: &'static str = "*111#";
 
-    pub fn new(client: RandomTelemetryClient) -> Self {
+    pub fn new(client: Client) -> Self {
         Self {
             telemetry_client: client,
             diagnostic_info: String::new(),
