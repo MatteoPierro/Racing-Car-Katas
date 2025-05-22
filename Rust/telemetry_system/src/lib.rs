@@ -2,13 +2,13 @@ use rand::rngs::StdRng;
 use rand::Rng;
 use rand::SeedableRng;
 
-pub struct TelemetryClient {
+pub struct RandomTelemetryClient {
     online_status: bool,
     diagnostic_message_result: String,
     connection_events_simulator: StdRng,
 }
 
-impl TelemetryClient {
+impl RandomTelemetryClient {
     pub const DIAGNOSTIC_MESSAGE: &'static str = "AT#UD";
 
     pub fn new() -> Self {
@@ -79,7 +79,7 @@ impl TelemetryClient {
 }
 
 pub struct TelemetryDiagnosticControls {
-    telemetry_client: TelemetryClient,
+    telemetry_client: RandomTelemetryClient,
     diagnostic_info: String,
 }
 
@@ -88,7 +88,7 @@ impl TelemetryDiagnosticControls {
 
     pub fn new() -> Self {
         Self {
-            telemetry_client: TelemetryClient::new(),
+            telemetry_client: RandomTelemetryClient::new(),
             diagnostic_info: String::new(),
         }
     }
@@ -118,7 +118,7 @@ impl TelemetryDiagnosticControls {
         }
 
         self.telemetry_client
-            .send(TelemetryClient::DIAGNOSTIC_MESSAGE);
+            .send(RandomTelemetryClient::DIAGNOSTIC_MESSAGE);
         self.diagnostic_info = self.telemetry_client.receive();
         Ok(())
     }
