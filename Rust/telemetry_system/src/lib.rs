@@ -150,4 +150,29 @@ mod tests {
             .get_diagnostic_info()
             .is_empty());
     }
+
+    #[test]
+    fn fails_when_client_cannot_connect() {
+        let mut controls = TelemetryDiagnosticControls::new(AlwaysOfflineClient {});
+        assert!(controls.check_transmission().is_err())
+    }
+
+    struct AlwaysOfflineClient;
+    impl TelemetryClient for AlwaysOfflineClient {
+        fn get_online_status(&self) -> bool {
+            false
+        }
+
+        fn connect(&mut self, _telemetry_server_connection_string: &str) {}
+
+        fn disconnect(&mut self) {}
+
+        fn send(&mut self, _message: &str) {
+            panic!("this should never be called!")
+        }
+
+        fn receive(&mut self) -> String {
+            panic!("this should never be called!")
+        }
+    }
 }
